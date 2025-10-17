@@ -1,0 +1,1857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitPlan - Personalized Exercise Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --emerald-50: #ecfdf5;
+            --emerald-100: #d1fae5;
+            --emerald-500: #10b981;
+            --emerald-600: #059669;
+            --emerald-700: #047857;
+            --emerald-800: #065f46;
+            --green-50: #f0fdf4;
+            --green-100: #dcfce7;
+            --green-600: #16a34a;
+            --teal-50: #f0fdfa;
+            --teal-100: #ccfbf1;
+            --teal-600: #0d9488;
+            --orange-50: #fff7ed;
+            --orange-100: #ffedd5;
+            --orange-500: #f97316;
+            --orange-700: #c2410c;
+            --purple-50: #faf5ff;
+            --purple-100: #f3e8ff;
+            --purple-500: #a855f7;
+            --purple-700: #7e22ce;
+            --blue-50: #eff6ff;
+            --blue-100: #dbeafe;
+            --blue-700: #1d4ed8;
+            --gray-100: #f3f4f6;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(to bottom right, var(--emerald-50), var(--green-50), var(--teal-50));
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            background: linear-gradient(to right, var(--emerald-700), var(--green-600));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        h4 {
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--emerald-100);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(to bottom right, var(--emerald-500), var(--green-600));
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .subtitle {
+            color: var(--gray-600);
+        }
+
+        /* Main */
+        .main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        /* Goals */
+        .goals-section {
+            margin-bottom: 3rem;
+        }
+
+        .goals-title {
+            margin-bottom: 1rem;
+            text-align: center;
+            color: var(--emerald-800);
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .goal-button {
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .goal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .goal-button.selected {
+            background: linear-gradient(to bottom right, var(--emerald-500), var(--green-600));
+            color: white;
+            border-color: var(--emerald-600);
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .goal-button.lose-weight:hover { background: var(--orange-50); border-color: var(--orange-500); }
+        .goal-button.gain-weight:hover { background: var(--purple-50); border-color: var(--purple-500); }
+        .goal-button.stay-healthy:hover { background: var(--green-50); border-color: var(--green-600); }
+        .goal-button.mental-health:hover { background: var(--blue-50); border-color: var(--blue-700); }
+
+        .goal-icon {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        /* Difficulty Buttons */
+        .difficulty-button {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 80px;
+        }
+
+        .difficulty-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: var(--teal-50);
+            border-color: var(--teal-600);
+        }
+
+        .difficulty-button.selected {
+            background: linear-gradient(to bottom right, var(--teal-600), #0891b2);
+            color: white;
+            border-color: var(--teal-600);
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .difficulty-label {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .difficulty-description {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Exercise Type Buttons */
+        .type-button {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 110px;
+        }
+
+        .type-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: #eef2ff;
+            border-color: #818cf8;
+        }
+
+        .type-button.selected {
+            background: linear-gradient(to bottom right, #6366f1, #8b5cf6);
+            color: white;
+            border-color: #6366f1;
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Exercise Count Buttons */
+        .count-button {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: var(--white);
+            border: 2px solid var(--gray-300);
+            border-radius: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 110px;
+        }
+
+        .count-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: var(--emerald-50);
+            border-color: var(--emerald-500);
+        }
+
+        .count-button.selected {
+            background: linear-gradient(to bottom right, #fbcfe8, #fda4af);
+            color: #831843;
+            border-color: #f9a8d4;
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .count-number {
+            font-size: 2rem;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .count-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .count-description {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Body Diagram */
+        .diagram-section {
+            background: var(--white);
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            border: 1px solid var(--emerald-100);
+            margin-bottom: 3rem;
+        }
+
+        .diagram-title {
+            margin-bottom: 0.5rem;
+            text-align: center;
+            color: var(--emerald-800);
+        }
+
+        .diagram-subtitle {
+            text-align: center;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+        }
+
+        .diagram-container {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            position: relative;
+        }
+
+        .body-view {
+            text-align: center;
+        }
+
+        .view-label {
+            margin-bottom: 0.5rem;
+            color: var(--gray-600);
+        }
+
+        .body-svg {
+            border: 2px solid var(--gray-300);
+            border-radius: 0.5rem;
+            background: linear-gradient(to bottom, var(--green-50), var(--emerald-50));
+        }
+
+        .muscle-path {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .muscle-path:hover {
+            fill-opacity: 0.8 !important;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-900);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+            white-space: nowrap;
+        }
+
+        .tooltip.show {
+            display: block;
+        }
+
+        /* Info Cards */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: var(--white);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid var(--emerald-100);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .icon-emerald { background: var(--emerald-100); color: var(--emerald-600); }
+        .icon-green { background: var(--green-100); color: var(--green-600); }
+        .icon-teal { background: var(--teal-100); color: var(--teal-600); }
+
+        .info-card h3 {
+            color: var(--emerald-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 0.75rem;
+            max-width: 56rem;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-300);
+            position: relative;
+        }
+
+        .modal-header h2 {
+            margin-bottom: 0.25rem;
+            padding-right: 140px;
+        }
+
+        .modal-description {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-mini-diagram {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 10;
+        }
+
+        @media (min-width: 768px) {
+            .modal-mini-diagram {
+                display: block;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-500);
+            padding: 0.5rem;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid var(--gray-300);
+            border-top-color: var(--emerald-600);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Exercise Plan */
+        .plan-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-header.lose-weight { background: var(--orange-100); color: var(--orange-700); }
+        .plan-header.gain-weight { background: var(--purple-100); color: var(--purple-700); }
+        .plan-header.stay-healthy { background: var(--green-100); color: var(--green-600); }
+        .plan-header.mental-health { background: var(--blue-100); color: var(--blue-700); }
+
+        .plan-header-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        .plan-header p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .exercise-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            color: var(--emerald-700);
+            margin-bottom: 0.75rem;
+        }
+
+        .exercise-card {
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            border-left: 4px solid var(--emerald-500);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: box-shadow 0.2s;
+        }
+
+        .exercise-card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .exercise-badges {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            text-transform: capitalize;
+        }
+
+        .badge-outline {
+            border: 1px solid var(--gray-300);
+            background: var(--white);
+        }
+
+        .badge-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .exercise-equipment {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-instructions {
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+
+        .empty-state {
+            background: var(--white);
+            border: 1px solid var(--gray-300);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            text-align: center;
+            color: var(--gray-600);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--gray-900);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 100;
+            max-width: 400px;
+        }
+
+        .toast.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Mini Body Diagram - Inside modal */
+        .mini-diagram-container {
+            background: var(--white);
+            border-radius: 0.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 2px solid #a7f3d0;
+            padding: 0.75rem;
+        }
+
+        .mini-diagram-header {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .mini-diagram-title {
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            margin: 0 0 0.25rem 0;
+        }
+
+        .mini-diagram-muscle {
+            font-size: 0.875rem;
+            color: var(--emerald-700);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .mini-diagram-svg {
+            background: linear-gradient(to bottom, var(--green-50), var(--emerald-50));
+            border-radius: 0.25rem;
+            border: 1px solid var(--emerald-100);
+        }
+
+        .mini-diagram-footer {
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .mini-diagram-view-label {
+            font-size: 0.75rem;
+            color: var(--emerald-600);
+            margin: 0;
+        }
+
+
+
+        @media (max-width: 768px) {
+            .goals-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .diagram-container {
+                gap: 1.5rem;
+            }
+
+            .body-svg {
+                width: 100%;
+                max-width: 250px;
+                height: auto;
+            }
+
+            .exercise-card > div {
+                grid-template-columns: 1fr !important;
+            }
+
+            .exercise-card > div > div:first-child {
+                height: 160px !important;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <div class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </div>
+                <h1>FitPlan - Personalized Exercise Guide</h1>
+            </div>
+            <p class="subtitle">Select your fitness goal and click on a body part to get a customized workout plan</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Goal Selection -->
+        <div class="goals-section">
+            <h2 class="goals-title">What's your fitness goal?</h2>
+            <div class="goals-grid">
+                <button class="goal-button lose-weight" onclick="selectGoal('lose_weight')">
+                    <svg class="goal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="6" y="14" width="12" height="8" rx="1"></rect>
+                        <path d="M9 14V6a3 3 0 0 1 6 0v8"></path>
+                        <line x1="9" y1="18" x2="15" y2="18"></line>
+                    </svg>
+                    <span>Lose Weight</span>
+                </button>
+                <button class="goal-button gain-weight" onclick="selectGoal('gain_weight')">
+                    <svg class="goal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22 7 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="16 7 22 7 22 13"></polyline>
+                    </svg>
+                    <span>Build Muscle</span>
+                </button>
+                <button class="goal-button stay-healthy selected" onclick="selectGoal('stay_healthy')">
+                    <svg class="goal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <span>Stay Healthy</span>
+                </button>
+                <button class="goal-button mental-health" onclick="selectGoal('mental_health')">
+                    <svg class="goal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="6"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
+                    <span>Mental Wellness</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Difficulty Level Selection -->
+        <div class="goals-section" style="margin-top: 2rem;">
+            <h2 class="section-title">What's your experience level?</h2>
+            <div class="goals-grid">
+                <button class="difficulty-button all selected" onclick="selectDifficulty('all')">
+                    <span class="difficulty-label">All Levels</span>
+                    <span class="difficulty-description">Show exercises for all difficulty levels</span>
+                </button>
+                <button class="difficulty-button beginner" onclick="selectDifficulty('beginner')">
+                    <span class="difficulty-label">Beginner</span>
+                    <span class="difficulty-description">New to fitness or this muscle group</span>
+                </button>
+                <button class="difficulty-button intermediate" onclick="selectDifficulty('intermediate')">
+                    <span class="difficulty-label">Intermediate</span>
+                    <span class="difficulty-description">Some experience with training</span>
+                </button>
+                <button class="difficulty-button expert" onclick="selectDifficulty('expert')">
+                    <span class="difficulty-label">Advanced</span>
+                    <span class="difficulty-description">Experienced with advanced exercises</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Exercise Type Selection -->
+        <div class="goals-section" style="margin-top: 2rem;">
+            <h2 class="section-title">What type of exercises?</h2>
+            <div class="goals-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
+                <button class="type-button all selected" onclick="selectExerciseType('all')">
+                    <span style="font-size: 1.5rem;">🎯</span>
+                    <span class="difficulty-label" style="font-size: 0.875rem;">All Types</span>
+                    <span class="difficulty-description">Any exercise type</span>
+                </button>
+                <button class="type-button strength" onclick="selectExerciseType('strength')">
+                    <span style="font-size: 1.5rem;">💪</span>
+                    <span class="difficulty-label" style="font-size: 0.875rem;">Strength</span>
+                    <span class="difficulty-description">Traditional strength training</span>
+                </button>
+                <button class="type-button cardio" onclick="selectExerciseType('cardio')">
+                    <span style="font-size: 1.5rem;">❤️</span>
+                    <span class="difficulty-label" style="font-size: 0.875rem;">Cardio</span>
+                    <span class="difficulty-description">Cardiovascular exercises</span>
+                </button>
+                <button class="type-button olympic" onclick="selectExerciseType('olympic_weightlifting')">
+                    <span style="font-size: 1.5rem;">🏋️</span>
+                    <span class="difficulty-label" style="font-size: 0.875rem;">Olympic</span>
+                    <span class="difficulty-description">Olympic weightlifting</span>
+                </button>
+                <button class="type-button powerlifting" onclick="selectExerciseType('powerlifting')">
+                    <span style="font-size: 1.5rem;">⚡</span>
+                    <span class="difficulty-label" style="font-size: 0.875rem;">Powerlifting</span>
+                    <span class="difficulty-description">Powerlifting movements</span>
+                </button>
+                <button class="type-button stretching" onclick="selectExerciseType('stretching')">
+                    <span style="font-size: 1.5rem;">🧘</span>
+                    <span class="difficulty-label" style="font-size: 0.875rem;">Stretching</span>
+                    <span class="difficulty-description">Flexibility & mobility</span>
+                </button>
+                <button class="type-button plyometrics" onclick="selectExerciseType('plyometrics')">
+                    <span style="font-size: 1.5rem;">🚀</span>
+                    <span class="difficulty-label" style="font-size: 0.875rem;">Plyometrics</span>
+                    <span class="difficulty-description">Explosive movements</span>
+                </button>
+                <button class="type-button strongman" onclick="selectExerciseType('strongman')">
+                    <span style="font-size: 1.5rem;">🦾</span>
+                    <span class="difficulty-label" style="font-size: 0.875rem;">Strongman</span>
+                    <span class="difficulty-description">Strongman exercises</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Exercise Count Selection -->
+        <div class="goals-section" style="margin-top: 2rem;">
+            <h2 class="section-title">How many main workout exercises?</h2>
+            <div class="goals-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+                <button class="count-button" onclick="selectExerciseCount(3)">
+                    <span class="count-number">3</span>
+                    <span class="count-label">Quick</span>
+                    <span class="count-description">~15 min workout</span>
+                </button>
+                <button class="count-button" onclick="selectExerciseCount(5)">
+                    <span class="count-number">5</span>
+                    <span class="count-label">Short</span>
+                    <span class="count-description">~25 min workout</span>
+                </button>
+                <button class="count-button selected" onclick="selectExerciseCount(7)">
+                    <span class="count-number">7</span>
+                    <span class="count-label">Standard</span>
+                    <span class="count-description">~35 min workout</span>
+                </button>
+                <button class="count-button" onclick="selectExerciseCount(10)">
+                    <span class="count-number">10</span>
+                    <span class="count-label">Extended</span>
+                    <span class="count-description">~50 min workout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Body Diagram -->
+        <div class="diagram-section">
+            <h2 class="diagram-title">Select a muscle group</h2>
+            <p class="diagram-subtitle">Click on any highlighted area to view targeted exercises</p>
+            <div class="diagram-container" id="diagramContainer">
+                <!-- Front View -->
+                <div class="body-view">
+                    <div class="view-label">Front</div>
+                    <svg class="body-svg" width="300" height="290" viewBox="0 0 300 290">
+                        <!-- Body outline front -->
+                        <ellipse cx="150" cy="80" rx="18" ry="22" fill="#f0f0f0" stroke="#999" stroke-width="2" />
+                        <path d="M150,102 L145,125 L135,115 L125,130 L120,155 L125,170 L140,215 L140,255 L145,260 L155,260 L160,255 L160,215 L175,170 L180,155 L175,130 L165,115 L155,125 Z" 
+                              fill="#f5f5f5" stroke="#999" stroke-width="2" />
+                        
+                        <!-- Muscle groups -->
+                        <path class="muscle-path" data-muscle="chest" data-name="Chest"
+                              d="M140,110 L160,110 L165,130 L155,140 L145,140 L135,130 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                        <path class="muscle-path" data-muscle="abdominals" data-name="Abs"
+                              d="M145,145 L155,145 L155,175 L145,175 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                        <path class="muscle-path" data-muscle="biceps" data-name="Biceps"
+                              d="M125,120 L132,120 L132,145 L125,145 Z M168,120 L175,120 L175,145 L168,145 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                        <path class="muscle-path" data-muscle="quadriceps" data-name="Quads"
+                              d="M140,180 L148,180 L148,225 L140,225 Z M152,180 L160,180 L160,225 L152,225 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                        <path class="muscle-path" data-muscle="calves" data-name="Calves"
+                              d="M140,230 L148,230 L148,260 L145,265 L140,260 Z M152,230 L160,230 L160,260 L155,265 L152,260 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                        <path class="muscle-path" data-muscle="forearms" data-name="Forearms"
+                              d="M120,148 L127,148 L127,170 L120,170 Z M173,148 L180,148 L180,170 L173,170 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                    </svg>
+                </div>
+
+                <!-- Back View -->
+                <div class="body-view">
+                    <div class="view-label">Back</div>
+                    <svg class="body-svg" width="300" height="290" viewBox="200 0 300 290">
+                        <!-- Body outline back -->
+                        <ellipse cx="350" cy="80" rx="18" ry="22" fill="#f0f0f0" stroke="#999" stroke-width="2" />
+                        <path d="M350,102 L345,125 L335,115 L325,130 L320,155 L325,170 L340,215 L340,255 L345,260 L355,260 L360,255 L360,215 L375,170 L380,155 L375,130 L365,115 L355,125 Z" 
+                              fill="#f5f5f5" stroke="#999" stroke-width="2" />
+                        
+                        <!-- Muscle groups -->
+                        <path class="muscle-path" data-muscle="glutes" data-name="Glutes"
+                              d="M340,165 L360,165 L360,185 L340,185 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                        <path class="muscle-path" data-muscle="hamstrings" data-name="Hamstrings"
+                              d="M340,190 L348,190 L348,225 L340,225 Z M352,190 L360,190 L360,225 L352,225 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                        <path class="muscle-path" data-muscle="lats" data-name="Lats"
+                              d="M330,120 L340,125 L340,155 L330,150 Z M360,125 L370,120 L370,150 L360,155 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                        <path class="muscle-path" data-muscle="traps" data-name="Traps"
+                              d="M340,105 L350,100 L360,105 L360,115 L340,115 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                        <path class="muscle-path" data-muscle="triceps" data-name="Triceps"
+                              d="M325,120 L332,120 L332,145 L325,145 Z M368,120 L375,120 L375,145 L368,145 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                        <path class="muscle-path" data-muscle="lower_back" data-name="Lower Back"
+                              d="M342,155 L358,155 L358,175 L342,175 Z" 
+                              fill="#34d399" fill-opacity="0.5" stroke="#059669" stroke-width="1.5" />
+                    </svg>
+                </div>
+
+                <!-- Tooltip -->
+                <div class="tooltip" id="tooltip"></div>
+            </div>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="info-card-icon icon-emerald">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="6"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
+                </div>
+                <h3>Goal-Focused Plans</h3>
+                <p>Exercises are automatically grouped and sequenced based on your selected fitness goal.</p>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-card-icon icon-green">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </div>
+                <h3>Holistic Approach</h3>
+                <p>Each plan includes warm-up, main workout, and cool-down phases for optimal results.</p>
+            </div>
+            
+            <div class="info-card">
+                <div class="info-card-icon icon-teal">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                        <polyline points="17 18 23 18 23 12"></polyline>
+                    </svg>
+                </div>
+                <h3>Progressive Training</h3>
+                <p>Exercises are categorized by difficulty level to match your current fitness level.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Exercise Plan</h2>
+                <p class="modal-description" id="modalDescription">Customized workout based on your goal</p>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="color: var(--gray-600);">Loading exercises...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let selectedGoal = 'stay_healthy';
+        let userDifficulty = 'all';
+        let exerciseType = 'all';
+        let exerciseCount = 7;
+        let exercises = [];
+        let selectedMuscle = null;
+
+        const goalLabels = {
+            'lose_weight': 'Lose Weight',
+            'gain_weight': 'Build Muscle',
+            'stay_healthy': 'Stay Healthy',
+            'mental_health': 'Mental Wellness'
+        };
+
+        const goalDescriptions = {
+            'lose_weight': 'High-intensity routine for calorie burning',
+            'gain_weight': 'Strength-focused routine for muscle growth',
+            'stay_healthy': 'Balanced routine for overall wellness',
+            'mental_health': 'Mindful movement for mental clarity'
+        };
+
+        // ========================================
+        // EXERCISE IMAGE/GIF MAPPING
+        // ========================================
+        // Add your exercise GIFs or images here!
+        // Format: 'exercise-name': 'url-to-gif-or-image'
+        // Use the exercise name in lowercase with hyphens instead of spaces
+        const EXERCISE_IMAGE_MAP = {
+                        'push-up': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'push-ups': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'pushup': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'pushups': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'incline-push-up': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'decline-push-up': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'wide-push-up': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'diamond-push-up': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'close-grip-push-up': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+// Squats and variations
+            'squat': 'https://images.unsplash.com/photo-1701826478825-8d975e7883f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'barbell-squat': 'https://images.unsplash.com/photo-1701826478825-8d975e7883f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'bodyweight-squat': 'https://images.unsplash.com/photo-1701826478825-8d975e7883f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'goblet-squat': 'https://images.unsplash.com/photo-1701826478825-8d975e7883f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Planks
+            'plank': 'https://images.unsplash.com/photo-1727712763476-f4e4e183ca4e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'side-plank': 'https://images.unsplash.com/photo-1727712763476-f4e4e183ca4e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Lunges
+            'lunge': 'https://images.unsplash.com/photo-1758599880618-3f03f2a401b4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'walking-lunge': 'https://images.unsplash.com/photo-1758599880618-3f03f2a401b4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'reverse-lunge': 'https://images.unsplash.com/photo-1758599880618-3f03f2a401b4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Deadlifts
+            'deadlift': 'https://images.unsplash.com/photo-1545612036-2872840642dc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'barbell-deadlift': 'https://images.unsplash.com/photo-1545612036-2872840642dc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'romanian-deadlift': 'https://images.unsplash.com/photo-1545612036-2872840642dc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'sumo-deadlift': 'https://images.unsplash.com/photo-1545612036-2872840642dc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Bench Press
+            'bench-press': 'https://images.unsplash.com/photo-1652363722833-509b3aac287b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'barbell-bench-press': 'https://images.unsplash.com/photo-1652363722833-509b3aac287b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'dumbbell-bench-press': 'https://images.unsplash.com/photo-1652363722833-509b3aac287b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'incline-bench-press': 'https://images.unsplash.com/photo-1652363722833-509b3aac287b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Pull-ups
+            'pull-up': 'https://images.unsplash.com/photo-1683760682579-68e590fa54d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'pull-ups': 'https://images.unsplash.com/photo-1683760682579-68e590fa54d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'chin-up': 'https://images.unsplash.com/photo-1683760682579-68e590fa54d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'assisted-pull-up': 'https://images.unsplash.com/photo-1683760682579-68e590fa54d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Bicep Curls
+            'bicep-curl': 'https://images.unsplash.com/photo-1598268030450-7a476f602bf6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'dumbbell-curl': 'https://images.unsplash.com/photo-1598268030450-7a476f602bf6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'barbell-curl': 'https://images.unsplash.com/photo-1598268030450-7a476f602bf6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'hammer-curl': 'https://images.unsplash.com/photo-1598268030450-7a476f602bf6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Shoulder Press
+            'shoulder-press': 'https://images.unsplash.com/photo-1729944950511-e9c71556cfd4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'military-press': 'https://images.unsplash.com/photo-1729944950511-e9c71556cfd4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'dumbbell-shoulder-press': 'https://images.unsplash.com/photo-1729944950511-e9c71556cfd4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'overhead-press': 'https://images.unsplash.com/photo-1729944950511-e9c71556cfd4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Leg Press
+            'leg-press': 'https://images.unsplash.com/photo-1758271613743-748b409c196b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Lat Pulldown
+            'lat-pulldown': 'https://images.unsplash.com/photo-1534872850130-5355701fcc89?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'wide-grip-lat-pulldown': 'https://images.unsplash.com/photo-1534872850130-5355701fcc89?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Calf Raises
+            'calf-raise': 'https://images.unsplash.com/photo-1666423489426-0c4db69512fc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'standing-calf-raise': 'https://images.unsplash.com/photo-1666423489426-0c4db69512fc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'seated-calf-raise': 'https://images.unsplash.com/photo-1666423489426-0c4db69512fc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Tricep Dips
+            'tricep-dip': 'https://images.unsplash.com/photo-1758521959221-605fe3c6a22a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'dips': 'https://images.unsplash.com/photo-1758521959221-605fe3c6a22a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'bench-dip': 'https://images.unsplash.com/photo-1758521959221-605fe3c6a22a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Rows
+            'seated-row': 'https://images.unsplash.com/photo-1704022384831-016d0c8604f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'cable-row': 'https://images.unsplash.com/photo-1704022384831-016d0c8604f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'bent-over-row': 'https://images.unsplash.com/photo-1704022384831-016d0c8604f9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Leg Curls
+            'leg-curl': 'https://images.unsplash.com/photo-1619458085129-2e8dc50604bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'lying-leg-curl': 'https://images.unsplash.com/photo-1619458085129-2e8dc50604bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'seated-leg-curl': 'https://images.unsplash.com/photo-1619458085129-2e8dc50604bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Dumbbell Rows
+            'dumbbell-row': 'https://images.unsplash.com/photo-1734630341082-0fec0e10126c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'single-arm-dumbbell-row': 'https://images.unsplash.com/photo-1734630341082-0fec0e10126c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'one-arm-dumbbell-row': 'https://images.unsplash.com/photo-1734630341082-0fec0e10126c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Barbell Rows
+            'barbell-row': 'https://images.unsplash.com/photo-1693707963745-297f4e5dd2a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'pendlay-row': 'https://images.unsplash.com/photo-1693707963745-297f4e5dd2a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Chest Fly
+            'chest-fly': 'https://images.unsplash.com/photo-1714925240743-133f909952b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'dumbbell-fly': 'https://images.unsplash.com/photo-1714925240743-133f909952b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'cable-fly': 'https://images.unsplash.com/photo-1714925240743-133f909952b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'pec-fly': 'https://images.unsplash.com/photo-1714925240743-133f909952b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'incline-dumbbell-fly': 'https://images.unsplash.com/photo-1714925240743-133f909952b9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Ab Exercises
+            'crunch': 'https://images.unsplash.com/photo-1758521960576-626603dfd2cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'crunches': 'https://images.unsplash.com/photo-1758521960576-626603dfd2cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'sit-up': 'https://images.unsplash.com/photo-1758521960576-626603dfd2cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'sit-ups': 'https://images.unsplash.com/photo-1758521960576-626603dfd2cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'bicycle-crunch': 'https://images.unsplash.com/photo-1758521960576-626603dfd2cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'reverse-crunch': 'https://images.unsplash.com/photo-1758521960576-626603dfd2cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'ab-crunch': 'https://images.unsplash.com/photo-1758521960576-626603dfd2cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Lateral Raises
+            'lateral-raise': 'https://images.unsplash.com/photo-1715531786031-7c4e30a45c62?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'side-lateral-raise': 'https://images.unsplash.com/photo-1715531786031-7c4e30a45c62?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'dumbbell-lateral-raise': 'https://images.unsplash.com/photo-1715531786031-7c4e30a45c62?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'cable-lateral-raise': 'https://images.unsplash.com/photo-1715531786031-7c4e30a45c62?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            
+            // Generic/Common Names - use general fitness images
+            'exercise': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'workout': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+            'warmup': 'https://images.unsplash.com/photo-1686247166156-0bca3e8b55d9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080',
+        };
+
+        function getExerciseImageKey(exerciseName) {
+            return exerciseName
+            .toLowerCase()
+              .replace(/\(.*?\)/g, '') // remove anything in parentheses
+              .trim()
+              .replace(/\s+/g, '-') // replace spaces with dashes
+              .replace(/[^a-z0-9-]/g, ''); // keep letters, numbers, and dashes only
+        }
+
+        function getExerciseImageHTML(exerciseName) {
+            const exerciseKey = getExerciseImageKey(exerciseName);
+            const imageUrl = EXERCISE_IMAGE_MAP[exerciseKey];
+
+            if (imageUrl) {
+                return `
+                    <div class="exercise-image-container" style="position: relative; width: 100%; height: 100%; background: #f3f4f6; overflow: hidden;">
+                        <img src="${imageUrl}" alt="${exerciseName}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); padding: 0.75rem;">
+                            <p style="color: white; font-size: 0.75rem; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${exerciseName}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div style="position: relative; width: 100%; height: 100%; background: linear-gradient(to bottom right, var(--emerald-50), var(--green-100)); overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                    <div style="text-align: center; padding: 1rem;">
+                        <div style="width: 4rem; height: 4rem; margin: 0 auto 0.75rem; background: rgba(16, 185, 129, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: #059669;">
+                                <path d="m6.5 6.5 11 11m-11 0 11-11M21 3v7h-7"></path>
+                            </svg>
+                        </div>
+                        <div style="font-size: 0.875rem; color: rgba(5, 150, 105, 0.8); margin-bottom: 0.25rem;">
+                            Exercise Image Placeholder
+                        </div>
+                        <div style="font-size: 0.75rem; color: rgba(5, 150, 105, 0.6); margin-top: 0.25rem;">
+                            Add GIF/image for:<br>
+                            <span style="font-weight: 500;">"${exerciseKey}"</span>
+                        </div>
+                        <div style="margin-top: 0.75rem; padding: 0.25rem 0.75rem; background: var(--emerald-100); border-radius: 0.25rem; display: inline-block; font-size: 0.75rem; color: #059669;">
+                            in EXERCISE_IMAGE_MAP
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Goal selection
+        function selectGoal(goal) {
+            selectedGoal = goal;
+            document.querySelectorAll('.goal-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.closest('.goal-button').classList.add('selected');
+        }
+
+        // Difficulty selection
+        function selectDifficulty(difficulty) {
+            userDifficulty = difficulty;
+            document.querySelectorAll('.difficulty-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.closest('.difficulty-button').classList.add('selected');
+        }
+
+        // Exercise type selection
+        function selectExerciseType(type) {
+            exerciseType = type;
+            document.querySelectorAll('.type-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.closest('.type-button').classList.add('selected');
+        }
+
+        // Exercise count selection
+        function selectExerciseCount(count) {
+            exerciseCount = count;
+            document.querySelectorAll('.count-button').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.closest('.count-button').classList.add('selected');
+        }
+
+        // Muscle hover and click
+        document.querySelectorAll('.muscle-path').forEach(path => {
+            path.addEventListener('mouseenter', function() {
+                const muscleName = this.dataset.name;
+                const tooltip = document.getElementById('tooltip');
+                tooltip.textContent = `Click to view ${muscleName} exercises`;
+                tooltip.classList.add('show');
+                this.style.fill = '#10b981';
+                this.style.fillOpacity = '0.8';
+            });
+
+            path.addEventListener('mouseleave', function() {
+                document.getElementById('tooltip').classList.remove('show');
+                this.style.fill = '#34d399';
+                this.style.fillOpacity = '0.5';
+            });
+
+            path.addEventListener('click', function() {
+                const muscleId = this.dataset.muscle;
+                const muscleName = this.dataset.name;
+                handleMuscleSelect(muscleId, muscleName);
+            });
+        });
+
+        // Fetch exercises
+        async function handleMuscleSelect(muscleId, muscleName) {
+            selectedMuscle = { id: muscleId, name: muscleName };
+            openModal();
+            
+            document.getElementById('modalTitle').textContent = `${muscleName} Exercise Plan`;
+            document.getElementById('modalDescription').textContent = `Customized workout based on your goal: ${goalLabels[selectedGoal]}`;
+            
+            // Show loading
+            // Show mini diagram
+            renderMiniDiagram();
+            
+            document.getElementById('modalBody').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="color: var(--gray-600);">Loading exercises...</p>
+                </div>
+            `;
+
+            try {
+                // Build API URL with difficulty and type filters
+                let apiUrl = `https://api.api-ninjas.com/v1/exercises?muscle=${muscleId}`;
+                if (userDifficulty !== 'all') {
+                    apiUrl += `&difficulty=${userDifficulty}`;
+                }
+                if (exerciseType !== 'all') {
+                    apiUrl += `&type=${exerciseType}`;
+                }
+
+                const response = await fetch(apiUrl, {
+                    headers: {
+                        'X-Api-Key': '64uL2iyObI51JO9q9MGZkw==VQtIyRE0fkQJou7m'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch exercises.JSON edit?');
+                }
+
+                exercises = await response.json();
+                
+                if (exercises.length === 0) {
+                    const filters = [];
+                    if (userDifficulty !== 'all') filters.push(userDifficulty + ' level');
+                    if (exerciseType !== 'all') filters.push(exerciseType.replace(/_/g, ' '));
+                    const filterText = filters.length > 0 ? ' ' + filters.join(', ') : '';
+                    showToast(`No${filterText} exercises found for this muscle group`);
+                } else {
+                    showToast(`Found ${exercises.length} exercise${exercises.length !== 1 ? 's' : ''}`);
+                }
+
+                displayExercisePlan();
+            } catch (error) {
+                console.error('Error fetching exercises:', error);
+                showToast('Failed to load exercises. Please try again.');
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="empty-state">
+                        <p>Failed to load exercises. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Display exercise plan
+        // Get programming (sets/reps/rest) based on goal and workout phase
+        function getProgramming(phase) {
+            const programs = {
+                lose_weight: {
+                    warmup: { sets: 2, reps: '12-15', rest: '30 sec', tempo: 'moderate' },
+                    main: { sets: 3, reps: '15-20', rest: '30-45 sec', tempo: 'fast' },
+                    cooldown: { sets: 1, reps: '10-12', rest: '30 sec', tempo: 'slow' }
+                },
+                gain_weight: {
+                    warmup: { sets: 2, reps: '8-10', rest: '60 sec', tempo: 'controlled' },
+                    main: { sets: 4, reps: '6-10', rest: '90-120 sec', tempo: 'controlled' },
+                    cooldown: { sets: 1, reps: '10-15', rest: '45 sec', tempo: 'slow' }
+                },
+                stay_healthy: {
+                    warmup: { sets: 2, reps: '10-12', rest: '45 sec', tempo: 'moderate' },
+                    main: { sets: 3, reps: '10-15', rest: '60 sec', tempo: 'moderate' },
+                    cooldown: { sets: 2, reps: '10-12', rest: '45 sec', tempo: 'slow' }
+                },
+                mental_health: {
+                    warmup: { sets: 1, reps: '8-10', rest: '60 sec', tempo: 'slow' },
+                    main: { sets: 2, reps: '8-12', rest: '60-90 sec', tempo: 'mindful' },
+                    cooldown: { sets: 2, reps: '5-8', rest: '60 sec', tempo: 'very slow' }
+                }
+            };
+            
+            const baseProgramming = programs[selectedGoal]?.[phase] || programs.stay_healthy[phase];
+
+            // Adjust based on user difficulty level
+            if (userDifficulty === 'beginner') {
+                // Beginners: reduce sets and reps slightly, increase rest
+                const [repMin, repMax] = baseProgramming.reps.split('-').map(n => parseInt(n));
+                const adjustedReps = `${Math.max(1, repMin - 2)}-${Math.max(1, repMax - 2)}`;
+                const adjustedRest = baseProgramming.rest.replace(/\d+/g, (match) => String(parseInt(match) + 15));
+                
+                return {
+                    sets: Math.max(1, baseProgramming.sets - 1),
+                    reps: adjustedReps,
+                    rest: adjustedRest,
+                    tempo: 'slow'
+                };
+            } else if (userDifficulty === 'expert') {
+                // Advanced: increase sets, add more reps
+                const [repMin, repMax] = baseProgramming.reps.split('-').map(n => parseInt(n));
+                const adjustedReps = `${repMin + 2}-${repMax + 2}`;
+                const adjustedRest = baseProgramming.rest.replace(/\d+/g, (match) => String(Math.max(15, parseInt(match) - 10)));
+                
+                return {
+                    sets: baseProgramming.sets + 1,
+                    reps: adjustedReps,
+                    rest: adjustedRest,
+                    tempo: baseProgramming.tempo
+                };
+            }
+            
+            return baseProgramming;
+        }
+
+        function displayExercisePlan() {
+            const plan = getExercisesByGoal();
+            const goalClass = selectedGoal.replace('_', '-');
+            
+            const badges = [];
+            if (userDifficulty !== 'all') {
+                badges.push(`<span class="badge badge-secondary" style="text-transform: capitalize;">${userDifficulty} Level</span>`);
+            }
+            if (exerciseType !== 'all') {
+                badges.push(`<span class="badge badge-outline" style="background: #eef2ff; color: #4338ca; border-color: #818cf8; text-transform: capitalize;">${exerciseType.replace(/_/g, ' ')}</span>`);
+            }
+            const badgesHtml = badges.length > 0 ? `<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">${badges.join('')}</div>` : '';
+            
+            let html = `
+                <div class="plan-header ${goalClass}" style="display: flex; align-items: center; gap: 1rem;">
+                    <svg class="plan-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        ${getGoalIcon(selectedGoal)}
+                    </svg>
+                    <div style="flex: 1;">
+                        <h2>${selectedMuscle.name} - ${getGoalLabel(selectedGoal)}</h2>
+                        <p>${goalDescriptions[selectedGoal]}</p>
+                    </div>
+                    ${badgesHtml}
+                </div>
+                
+                <!-- Timer and Completion Controls -->
+                <div id="timerControls" style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; padding: 1rem; background: linear-gradient(to right, #d1fae5, #a7f3d0); border-radius: 0.5rem; border: 2px solid #6ee7b7; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; background: white; padding: 0.5rem 1rem; border-radius: 0.5rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #6ee7b7;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span id="timerDisplay" style="font-family: monospace; color: #064e3b; font-weight: 500; min-width: 4rem;">00:00</span>
+                        </div>
+                        <button id="timerButton" class="goal-button" style="background: linear-gradient(to right, #10b981, #059669); color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; transition: all 0.2s;">
+                            <svg id="timerIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            <span id="timerButtonText">Start Workout</span>
+                        </button>
+                    </div>
+                    <button id="completeButton" class="goal-button" style="background: linear-gradient(to right, #059669, #047857); color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-weight: 500; transition: all 0.2s;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Complete Workout
+                    </button>
+                </div>
+                
+                <div id="completionMessage" style="display: none; padding: 1.5rem; background: linear-gradient(to right, #d1fae5, #a7f3d0); border-radius: 0.5rem; border: 2px solid #10b981; text-align: center; margin-bottom: 1rem;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.75rem;">
+                        <div style="width: 4rem; height: 4rem; background: linear-gradient(to right, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                                <path d="M4 22h16"></path>
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                            </svg>
+                        </div>
+                        <h3 style="color: #065f46; margin: 0;">Workout Completed! 🎉</h3>
+                        <p id="completionTime" style="color: #047857; margin: 0;"></p>
+                        <p style="font-size: 0.875rem; color: #059669; margin: 0;">Keep up the amazing work! Consistency is key to reaching your goals.</p>
+                    </div>
+                </div>
+            `;
+
+            if (plan.warmup && plan.warmup.length > 0) {
+                html += renderExerciseSection(plan.warmup, '🔥 Warm-up', 'warmup', 0);
+            }
+            if (plan.main && plan.main.length > 0) {
+                html += renderExerciseSection(plan.main, '💪 Main Workout', 'main', 1);
+            }
+            if (plan.cooldown && plan.cooldown.length > 0) {
+                html += renderExerciseSection(plan.cooldown, '🧘 Cool-down', 'cooldown', 0);
+            }
+
+            if (exercises.length === 0) {
+                html = `
+                    <div class="empty-state">
+                        <p>No exercises found for this muscle group. Try selecting another body part.</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('modalBody').innerHTML = html;
+        }
+
+        function getExercisesByGoal() {
+            const allExercises = [...exercises];
+            
+            // Warmup and cooldown don't count toward the user's selected exercise count
+            // The exerciseCount is ONLY for main workout exercises
+            const warmupCount = Math.min(2, Math.floor(allExercises.length * 0.15)); // ~15% for warmup, max 2
+            const cooldownCount = Math.min(2, Math.floor(allExercises.length * 0.15)); // ~15% for cooldown, max 2
+            const mainCount = exerciseCount; // Use the exact count the user selected
+            
+            switch (selectedGoal) {
+                case 'lose_weight':
+                    return {
+                        warmup: allExercises.filter(e => e.difficulty === 'beginner').slice(0, warmupCount),
+                        main: allExercises.slice(0, mainCount),
+                        cooldown: allExercises.filter(e => e.type === 'stretching' || e.difficulty === 'beginner').slice(0, cooldownCount)
+                    };
+                
+                case 'gain_weight':
+                    return {
+                        warmup: allExercises.filter(e => e.difficulty === 'beginner').slice(0, warmupCount),
+                        main: allExercises.filter(e => e.type === 'strength' || e.type === 'powerlifting').slice(0, mainCount),
+                        cooldown: allExercises.slice(-cooldownCount)
+                    };
+                
+                case 'stay_healthy':
+                    return {
+                        warmup: allExercises.slice(0, warmupCount),
+                        main: allExercises.slice(warmupCount, warmupCount + mainCount),
+                        cooldown: allExercises.slice(-cooldownCount)
+                    };
+                
+                case 'mental_health':
+                    return {
+                        warmup: allExercises.filter(e => e.difficulty === 'beginner').slice(0, warmupCount),
+                        main: allExercises.slice(0, mainCount),
+                        cooldown: allExercises.slice(-cooldownCount)
+                    };
+                
+                default:
+                    return {
+                        warmup: allExercises.slice(0, warmupCount),
+                        main: allExercises.slice(warmupCount, warmupCount + mainCount),
+                        cooldown: allExercises.slice(-cooldownCount)
+                    };
+            }
+        }
+
+        function renderExerciseSection(exerciseList, title, phase, startNumber) {
+            if (!exerciseList || exerciseList.length === 0) return '';
+            
+            const programming = getProgramming(phase);
+            
+            let html = `
+                <div class="exercise-section">
+                    <h3 class="section-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                        ${title}
+                        ${phase === 'main' ? `<span class="badge badge-outline" style="background: #d1fae5; color: #065f46; border-color: #6ee7b7; margin-left: 0.5rem;">${exerciseList.length} exercise${exerciseList.length !== 1 ? 's' : ''}</span>` : ''}
+                    </h3>
+            `;
+
+            exerciseList.forEach((exercise, idx) => {
+                const exerciseNumber = startNumber > 0 ? startNumber + idx : null;
+                html += `
+                    <div class="exercise-card" style="padding: 0; overflow: hidden;">
+                        <div style="display: grid; grid-template-columns: 300px 1fr; gap: 0;">
+                            <div style="height: 200px;">
+                                ${getExerciseImageHTML(exercise.name)}
+                            </div>
+                            <div style="padding: 1rem;">
+                                <div class="exercise-header" style="margin-bottom: 0.5rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        ${exerciseNumber ? `<div style="flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: #059669; color: white; display: flex; align-items: center; justify-content: center; font-weight: 500;">${exerciseNumber}</div>` : ''}
+                                        <h4 style="margin: 0;">${exercise.name}</h4>
+                                    </div>
+                                    <div class="exercise-badges">
+                                        <span class="badge badge-outline">${exercise.difficulty}</span>
+                                        <span class="badge badge-secondary">${exercise.type}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Programming Info - Sets, Reps, Rest -->
+                                <div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.75rem; padding: 0.75rem; background: var(--emerald-50); border-radius: 0.5rem; border: 1px solid var(--emerald-100);">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-600)" stroke-width="2">
+                                            <path d="M17 2v20M7 2v20"></path>
+                                            <path d="M15 9l5-5-5-5M9 15l-5 5 5 5"></path>
+                                        </svg>
+                                        <div>
+                                            <p style="font-size: 0.75rem; color: rgba(5, 150, 105, 0.7); margin: 0;">Sets</p>
+                                            <p style="font-weight: 500; color: var(--emerald-900); margin: 0;">${programming.sets}</p>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-600)" stroke-width="2">
+                                            <path d="M6.5 6.5h11M3.5 14.5h17"></path>
+                                            <path d="M6.5 6.5c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2zM17.5 6.5c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2zM3.5 14.5c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2zM20.5 14.5c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"></path>
+                                        </svg>
+                                        <div>
+                                            <p style="font-size: 0.75rem; color: rgba(5, 150, 105, 0.7); margin: 0;">Reps</p>
+                                            <p style="font-weight: 500; color: var(--emerald-900); margin: 0;">${programming.reps}</p>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-600)" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <polyline points="12 6 12 12 16 14"></polyline>
+                                        </svg>
+                                        <div>
+                                            <p style="font-size: 0.75rem; color: rgba(5, 150, 105, 0.7); margin: 0;">Rest</p>
+                                            <p style="font-weight: 500; color: var(--emerald-900); margin: 0;">${programming.rest}</p>
+                                        </div>
+                                    </div>
+                                    ${programming.tempo ? `
+                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-600)" stroke-width="2">
+                                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                            </svg>
+                                            <div>
+                                                <p style="font-size: 0.75rem; color: rgba(5, 150, 105, 0.7); margin: 0;">Tempo</p>
+                                                <p style="font-weight: 500; color: var(--emerald-900); margin: 0; text-transform: capitalize;">${programming.tempo}</p>
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                
+                                ${exercise.equipment && exercise.equipment !== 'body_only' ? 
+                                    `<p class="exercise-equipment">Equipment: ${exercise.equipment.replace(/_/g, ' ')}</p>` : ''}
+                                <p class="exercise-instructions">${exercise.instructions}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            return html;
+        }
+
+        function getGoalLabel(goal) {
+            const labels = {
+                'lose_weight': 'Weight Loss Plan',
+                'gain_weight': 'Muscle Building Plan',
+                'stay_healthy': 'Wellness Plan',
+                'mental_health': 'Mental Wellness Plan'
+            };
+            return labels[goal] || 'Exercise Plan';
+        }
+
+        function getGoalIcon(goal) {
+            const icons = {
+                'lose_weight': '<rect x="6" y="14" width="12" height="8" rx="1"></rect><path d="M9 14V6a3 3 0 0 1 6 0v8"></path><line x1="9" y1="18" x2="15" y2="18"></line>',
+                'gain_weight': '<polyline points="22 7 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="16 7 22 7 22 13"></polyline>',
+                'stay_healthy': '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>',
+                'mental_health': '<circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle>'
+            };
+            return icons[goal] || icons['stay_healthy'];
+        }
+
+        // Modal functions
+        function openModal() {
+            document.getElementById('modalOverlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target === document.getElementById('modalOverlay')) {
+                closeModal();
+            }
+        }
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Mini Body Diagram Functions
+        function renderMiniDiagram() {
+            if (!selectedMuscle) return;
+            
+            const muscleGroups = {
+                'chest': { name: 'Chest', path: 'M140,100 L160,100 L165,120 L155,130 L145,130 L135,120 Z', view: 'front' },
+                'abdominals': { name: 'Abs', path: 'M145,135 L155,135 L155,165 L145,165 Z', view: 'front' },
+                'biceps': { name: 'Biceps', path: 'M125,110 L132,110 L132,135 L125,135 Z M168,110 L175,110 L175,135 L168,135 Z', view: 'front' },
+                'quadriceps': { name: 'Quads', path: 'M140,170 L148,170 L148,215 L140,215 Z M152,170 L160,170 L160,215 L152,215 Z', view: 'front' },
+                'calves': { name: 'Calves', path: 'M140,220 L148,220 L148,250 L145,255 L140,250 Z M152,220 L160,220 L160,250 L155,255 L152,250 Z', view: 'front' },
+                'forearms': { name: 'Forearms', path: 'M120,138 L127,138 L127,160 L120,160 Z M173,138 L180,138 L180,160 L173,160 Z', view: 'front' },
+                'glutes': { name: 'Glutes', path: 'M340,155 L360,155 L360,175 L340,175 Z', view: 'back' },
+                'hamstrings': { name: 'Hamstrings', path: 'M340,180 L348,180 L348,215 L340,215 Z M352,180 L360,180 L360,215 L352,215 Z', view: 'back' },
+                'lats': { name: 'Lats', path: 'M330,110 L340,115 L340,145 L330,140 Z M360,115 L370,110 L370,140 L360,145 Z', view: 'back' },
+                'traps': { name: 'Traps', path: 'M340,95 L350,90 L360,95 L360,105 L340,105 Z', view: 'back' },
+                'triceps': { name: 'Triceps', path: 'M325,110 L332,110 L332,135 L325,135 Z M368,110 L375,110 L375,135 L368,135 Z', view: 'back' },
+                'lower_back': { name: 'Lower Back', path: 'M342,145 L358,145 L358,165 L342,165 Z', view: 'back' }
+            };
+
+            const muscle = muscleGroups[selectedMuscle.id];
+            if (!muscle) return;
+
+            const isFrontView = muscle.view === 'front';
+            const viewBox = isFrontView ? "0 0 300 280" : "200 0 300 280";
+            const centerX = isFrontView ? 150 : 350;
+
+            // Get all muscles for the current view (dimmed)
+            const viewMuscles = Object.entries(muscleGroups).filter(([_, m]) => m.view === muscle.view);
+
+            let musclePaths = '';
+            viewMuscles.forEach(([id, m]) => {
+                const isSelected = id === selectedMuscle.id;
+                musclePaths += `
+                    <path
+                        d="${m.path}"
+                        fill="${isSelected ? '#10b981' : '#d1d5db'}"
+                        fill-opacity="${isSelected ? '0.9' : '0.3'}"
+                        stroke="${isSelected ? '#059669' : '#9ca3af'}"
+                        stroke-width="${isSelected ? '2' : '1'}"
+                    />
+                `;
+            });
+
+            const html = `
+                <div class="modal-mini-diagram" id="miniDiagramContainer">
+                    <div class="mini-diagram-container">
+                        <div class="mini-diagram-header">
+                            <p class="mini-diagram-title">Targeting</p>
+                            <p class="mini-diagram-muscle">${selectedMuscle.name}</p>
+                        </div>
+                        
+                        <svg class="mini-diagram-svg" width="120" height="140" viewBox="${viewBox}">
+                            <!-- Body outline -->
+                            <ellipse cx="${centerX}" cy="75" rx="18" ry="22" fill="#f0f0f0" stroke="#999" stroke-width="2" opacity="0.3" />
+                            <path d="M${centerX},97 L${centerX - 5},120 L${centerX - 15},110 L${centerX - 25},125 L${centerX - 30},150 L${centerX - 25},160 L${centerX - 10},205 L${centerX - 10},245 L${centerX - 5},250 L${centerX + 5},250 L${centerX + 10},245 L${centerX + 10},205 L${centerX + 25},160 L${centerX + 30},150 L${centerX + 25},125 L${centerX + 15},110 L${centerX + 5},120 Z" 
+                                  fill="#f5f5f5" stroke="#999" stroke-width="2" opacity="0.3" />
+                            
+                            <!-- Muscle groups -->
+                            ${musclePaths}
+                        </svg>
+                        
+                        <div class="mini-diagram-footer">
+                            <p class="mini-diagram-view-label">${isFrontView ? 'Front' : 'Back'}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Insert into modal header
+            const modalHeader = document.querySelector('.modal-header');
+            const existingMiniDiagram = document.getElementById('miniDiagramContainer');
+            if (existingMiniDiagram) {
+                existingMiniDiagram.remove();
+            }
+            modalHeader.insertAdjacentHTML('beforeend', html);
+        }
+
+        // Timer functionality
+        let timerInterval = null;
+        let elapsedTime = 0;
+        let isTimerRunning = false;
+        let workoutCompleted = false;
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function resetTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = null;
+            elapsedTime = 0;
+            isTimerRunning = false;
+            workoutCompleted = false;
+            
+            const timerDisplay = document.getElementById('timerDisplay');
+            if (timerDisplay) timerDisplay.textContent = '00:00';
+            
+            const timerControls = document.getElementById('timerControls');
+            const completionMessage = document.getElementById('completionMessage');
+            if (timerControls) timerControls.style.display = 'flex';
+            if (completionMessage) completionMessage.style.display = 'none';
+        }
+
+        function initializeTimer() {
+            resetTimer();
+            
+            const timerButton = document.getElementById('timerButton');
+            const completeButton = document.getElementById('completeButton');
+            
+            if (timerButton) {
+                timerButton.onclick = toggleTimer;
+            }
+            
+            if (completeButton) {
+                completeButton.onclick = completeWorkout;
+            }
+        }
+
+        function toggleTimer() {
+            isTimerRunning = !isTimerRunning;
+            
+            const timerButton = document.getElementById('timerButton');
+            const timerIcon = document.getElementById('timerIcon');
+            const timerButtonText = document.getElementById('timerButtonText');
+            
+            if (isTimerRunning) {
+                // Start/Resume timer
+                timerInterval = setInterval(() => {
+                    elapsedTime++;
+                    const timerDisplay = document.getElementById('timerDisplay');
+                    if (timerDisplay) {
+                        timerDisplay.textContent = formatTime(elapsedTime);
+                    }
+                }, 1000);
+                
+                // Update button to Pause
+                timerButton.style.background = 'white';
+                timerButton.style.color = '#374151';
+                timerButton.style.border = '1px solid #d1d5db';
+                timerIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>';
+                timerButtonText.textContent = 'Pause';
+                
+                if (elapsedTime === 0) {
+                    showToast('Workout timer started! You got this! 💪');
+                }
+            } else {
+                // Pause timer
+                if (timerInterval) clearInterval(timerInterval);
+                
+                // Update button to Resume/Start
+                timerButton.style.background = 'linear-gradient(to right, #10b981, #059669)';
+                timerButton.style.color = 'white';
+                timerButton.style.border = 'none';
+                timerIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"></polygon>';
+                timerButtonText.textContent = elapsedTime > 0 ? 'Resume' : 'Start Workout';
+            }
+        }
+
+        function completeWorkout() {
+            workoutCompleted = true;
+            isTimerRunning = false;
+            if (timerInterval) clearInterval(timerInterval);
+            
+            const timerControls = document.getElementById('timerControls');
+            const completionMessage = document.getElementById('completionMessage');
+            const completionTime = document.getElementById('completionTime');
+            
+            if (timerControls) timerControls.style.display = 'none';
+            if (completionMessage) completionMessage.style.display = 'block';
+            if (completionTime) {
+                completionTime.textContent = `Time: ${formatTime(elapsedTime)} • Great job on your ${selectedMuscle.name} workout!`;
+            }
+            
+            const encouragements = [
+                `Amazing work on your ${selectedMuscle.name} workout! 🎉`,
+                `You crushed it! ${selectedMuscle.name} gains incoming! 💪`,
+                `Fantastic job! Your ${selectedMuscle.name} muscles will thank you! 🌟`,
+                `Outstanding effort! Keep up the great work! 🔥`,
+                `You did it! Another step closer to your fitness goals! ⭐`,
+                `Incredible dedication! Your ${selectedMuscle.name} workout is complete! 🏆`,
+                `Way to go! You're stronger than you think! 💚`,
+                `Excellent session! Your hard work is paying off! 🎯`,
+            ];
+            
+            const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
+            showToast(randomEncouragement);
+        }
+
+        // Update handleMuscleSelect to initialize timer
+        const originalHandleMuscleSelect = handleMuscleSelect;
+        handleMuscleSelect = async function(muscleId, muscleName) {
+            await originalHandleMuscleSelect(muscleId, muscleName);
+            // Timer will be initialized after displayExercisePlan
+        };
+
+        // Update displayExercisePlan to initialize timer
+        const originalDisplayExercisePlan = displayExercisePlan;
+        displayExercisePlan = function() {
+            originalDisplayExercisePlan();
+            // Initialize timer after content is rendered
+            setTimeout(() => {
+                initializeTimer();
+            }, 100);
+        };
+    </script>
+</body>
+</html>
